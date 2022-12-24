@@ -1,7 +1,6 @@
 package main
 
 import (
-	"SimpleCRUD/utils"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -25,14 +24,13 @@ type Todo struct {
 
 var client *mongo.Client
 var err error
-var config utils.Config
 
 func Init() {
-	config, err = utils.LoadConfig(".")
 	if err != nil {
 		panic(err)
 	}
-	client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(config.MongoUri))
+	fmt.Print(os.Getenv("MONGO_URI"))
+	client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(os.Getenv("MONGO_URI")))
 	if err != nil {
 		panic(err)
 	}
@@ -144,9 +142,8 @@ func DeleteTodoEndpoint(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	fmt.Println("Starting application...")
-	fmt.Println(os.Getenv("PORT1"))
 	Init()
-	port := config.Port
+	port := os.Getenv("PORT")
 	fmt.Println(port)
 	router := mux.NewRouter()
 	router.HandleFunc("/todo", CreateTodoEndpoint).Methods("POST")
