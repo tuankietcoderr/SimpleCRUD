@@ -144,10 +144,10 @@ func DeleteTodoEndpoint(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	fmt.Println("Starting application...")
+	fmt.Println(os.Getenv("PORT1"))
 	Init()
 	port := config.Port
 	fmt.Println(port)
-	fmt.Println(os.Getenv("PORT1"))
 	router := mux.NewRouter()
 	router.HandleFunc("/todo", CreateTodoEndpoint).Methods("POST")
 	router.HandleFunc("/todos", GetTodosEndpoint).Methods("GET")
