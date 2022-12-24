@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -29,7 +30,6 @@ func Init() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Print(os.Getenv("MONGO_URI"))
 	client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(os.Getenv("MONGO_URI")))
 	if err != nil {
 		panic(err)
@@ -92,10 +92,11 @@ func GetTodoEndpoint(w http.ResponseWriter, r *http.Request) {
 
 	params := mux.Vars(r)
 	id, _ := primitive.ObjectIDFromHex(params["id"])
+	filter := bson.M{"_id": id}
 	var todo Todo
 	collection := client.Database("mongocruddb").Collection("todos")
 	ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
-	err := collection.FindOne(ctx, Todo{ID: id}).Decode(&todo)
+	err := collection.FindOne(ctx, filter).Decode(&todo)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
@@ -141,10 +142,14 @@ func DeleteTodoEndpoint(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		fmt.Println("Production mode...")
+	}
 	fmt.Println("Starting application...")
 	Init()
 	port := os.Getenv("PORT")
-	fmt.Println(port)
+	fmt.Println("Server is listening on port " + port)
 	router := mux.NewRouter()
 	router.HandleFunc("/todo", CreateTodoEndpoint).Methods("POST")
 	router.HandleFunc("/todos", GetTodosEndpoint).Methods("GET")
