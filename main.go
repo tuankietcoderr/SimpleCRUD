@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -24,10 +25,26 @@ type Todo struct {
 var client *mongo.Client
 var err error
 
-const uri = "mongodb+srv://tuankietcoder:OGynngdwjanUSpJq@mongocruddb.10evvr2.mongodb.net/mongocruddb?retryWrites=true&w=majority"
+func Viper(name string) (res interface{}, err error) {
+	viper.SetConfigFile(".env")
+	viper.AutomaticEnv()
+
+	err = viper.ReadInConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	res = viper.Get(name)
+	return res, nil
+}
 
 func Init() {
-	client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
+
+	uri, err := Viper("MONGO_URI")
+	if err != nil {
+		panic(err)
+	}
+	client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(uri.(string)))
 	if err != nil {
 		panic(err)
 	}
@@ -138,7 +155,15 @@ func DeleteTodoEndpoint(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	viper.SetConfigFile(".env")
+	viper.ReadInConfig()
+	viper.AutomaticEnv()
 	fmt.Println("Starting application...")
+	port, err := Viper("PORT")
+	fmt.Println(port)
+	if err != nil {
+		panic(err)
+	}
 	Init()
 	router := mux.NewRouter()
 	router.HandleFunc("/todo", CreateTodoEndpoint).Methods("POST")
@@ -146,6 +171,6 @@ func main() {
 	router.HandleFunc("/todo/{id}", GetTodoEndpoint).Methods("GET")
 	router.HandleFunc("/todo/{id}", UpdateTodoEndpoint).Methods("PUT")
 	router.HandleFunc("/todo/{id}", DeleteTodoEndpoint).Methods("DELETE")
-	http.ListenAndServe(":20034", router)
+	http.ListenAndServe(":"+port.(string), router)
 	Disconnet()
 }
