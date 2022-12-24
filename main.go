@@ -110,12 +110,28 @@ func UpdateTodoEndpoint(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("content-type", "application/json")
 	params := mux.Vars(r)
 	id, _ := primitive.ObjectIDFromHex(params["id"])
+	collection := client.Database("mongocruddb").Collection("todos")
 	var todo Todo
 	json.NewDecoder(r.Body).Decode(&todo)
 	filter := bson.M{"_id": id}
-	update := bson.M{"status": todo.Status, "title": todo.Title}
-	collection := client.Database("mongocruddb").Collection("todos")
 	ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
+	var update primitive.M
+	var oldTodo Todo
+	if todo.Status == 0 {
+		err := collection.FindOne(ctx, filter).Decode(&oldTodo)
+		if err != nil {
+			panic(err)
+		}
+		todo.Status = oldTodo.Status
+	}
+	if len(todo.Title) == 0 {
+		err := collection.FindOne(ctx, filter).Decode(&oldTodo)
+		if err != nil {
+			panic(err)
+		}
+		todo.Title = oldTodo.Title
+	}
+	update = bson.M{"status": todo.Status, "title": todo.Title}
 	_, err := collection.ReplaceOne(ctx, filter, update)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
