@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"net/http"
 	"os"
 	"time"
@@ -141,6 +142,18 @@ func DeleteTodoEndpoint(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(`{"message": "Successfully deleted!"}`))
 }
 
+var tmpl *template.Template
+
+const html = "doc/api.html"
+
+func InitHTML() {
+	tmpl = template.Must(template.ParseFiles(html))
+}
+
+func GetAPIDocumentation(w http.ResponseWriter, r *http.Request) {
+	tmpl.ExecuteTemplate(w, "api.html", nil)
+}
+
 func main() {
 	err := godotenv.Load(".env")
 	if err != nil {
@@ -148,9 +161,11 @@ func main() {
 	}
 	fmt.Println("Starting application...")
 	Init()
+	InitHTML()
 	port := os.Getenv("PORT")
 	fmt.Println("Server is listening on port " + port)
 	router := mux.NewRouter()
+	router.HandleFunc("/", GetAPIDocumentation).Methods("GET")
 	router.HandleFunc("/todo", CreateTodoEndpoint).Methods("POST")
 	router.HandleFunc("/todos", GetTodosEndpoint).Methods("GET")
 	router.HandleFunc("/todo/{id}", GetTodoEndpoint).Methods("GET")

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/tailwindcss@2.2.19/dist/tailwind.min.css"
+    />
+    <!-- <link rel="shortcut icon" href="/public/golang.ico" type="image/x-icon" /> -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>API Documentation</title>
+    <style>
+      * {
+        font-family: Consolas, monospace;
+      }
+      code {
+        background-color: lightblue;
+        font-weight: bold;
+        border-radius: 5px;
+        padding: 0 0.2rem;
+        color: darkblue;
+      }
+      pre {
+        padding: 1rem;
+        border-radius: 5px;
+        background-color: rgb(244, 244, 244);
+        margin-bottom: 1rem !important;
+        overflow: auto;
+      }
+      pre > code {
+        background-color: transparent;
+        font-weight: normal;
+        color: black;
+      }
+      pre::after {
+        right: 1rem;
+        position: absolute;
+        top: 1rem;
+        padding: 0 0.4rem;
+        border-radius: 5px;
+      }
+      pre[data-method="get"]::after {
+        content: "GET";
+        color: green;
+        background-color: lightgreen;
+      }
+
+      pre[data-method="post"]::after {
+        content: "POST";
+        color: blue;
+        background-color: rgb(175, 235, 255);
+      }
+
+      pre[data-method="put"]::after {
+        content: "PUT";
+        color: orangered;
+        background-color: rgb(255, 199, 32);
+      }
+
+      pre[data-method="delete"]::after {
+        content: "DELETE";
+        color: white;
+        background-color: rgb(255, 58, 58);
+      }
+
+      pre[data-method="response"]::after {
+        content: "RESPONSE";
+        color: green;
+        background-color: greenyellow;
+      }
+
+      pre[data-method="request"]::after {
+        content: "REQUEST";
+        color: blue;
+        background-color: rgb(175, 235, 255);
+      }
+
+      pre[data-method="error"]::after {
+        content: "ERROR";
+        color: white;
+        background-color: rgb(255, 58, 58);
+      }
+
+      pre[data-method="get"],
+      pre[data-method="post"],
+      pre[data-method="put"],
+      pre[data-method="delete"],
+      pre[data-method="response"],
+      pre[data-method="request"],
+      pre[data-method="error"] {
+        position: relative;
+      }
+      aside > a {
+        padding: 0.5rem 1rem;
+      }
+      aside > a:hover {
+        background-color: rgb(174, 224, 255);
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen relative">
+    <div
+      class="min-h-screen gap-4 bg-sky-200 flex flex-col justify-center items-center"
+    >
+      <img
+        src="https://i.ibb.co/J3QR3L7/golang.png"
+        alt="golang"
+        class="w-60"
+      />
+      <h1 class="text-3xl font-bold text-center">
+        Welcome to my API Documentation
+      </h1>
+      <a href="#get_started">
+        <button
+          class="flex border border-black rounded px-4 py-2 sm:hover:bg-sky-100"
+        >
+          Let's
+          <img src="https://i.ibb.co/F4GP3pk/go.png" alt="go" class="w-10" />
+        </button>
+      </a>
+    </div>
+    <div
+      class="grid md:grid-cols-[30%_70%] grid-cols-1 md:mx-[10%] mx-[1rem] text-black/[0.7] mb-[5%] gap-4 relative"
+    >
+      <aside class="flex flex-col md:flex hidden mt-4 self-start sticky top-4">
+        <a href="#get-all-todos">Get all todos</a>
+        <a href="#get-a-todo">Get a todo</a>
+        <a href="#create-a-todo">Create a todo</a>
+        <a href="#update-a-todo">Update a todo</a>
+        <a href="#delete-a-todo">Delete a todo</a>
+      </aside>
+      <div>
+        <div class="bg-sky-100 p-4 my-4 rounded">
+          <span class="text-sky-500 font-semibold">Note:</span>
+          All things of this API are performed with
+          <span class="font-bold text-orange-500">Postman</span>
+        </div>
+        <article id="get_started">
+          <h2 id="get-all-todos" class="sm:hover:underline font-bold text-xl">
+            Get all todos
+          </h2>
+          <p>To get all todos from my API:</p>
+          <pre
+            data-method="get"
+          ><code>https://todo-crud.up.railway.app/todos</code></pre>
+          <p>Simple response</p>
+          <pre data-method="response"><code>[
+  {
+      "_id": "63a698cb3a772316696921fb",
+      "title": "Running 20km",
+      "status": 2
+  },
+  {
+      "_id": "63a6b4998f6ec0f3c3ec79e7",
+      "title": "Running 20km",
+      "status": 2
+  }
+]</code></pre>
+
+          <h2
+            id="get-specific-todo"
+            class="sm:hover:underline font-bold text-xl"
+          >
+            Get a todo
+          </h2>
+          <p>To get a specific todo:</p>
+          <pre
+            data-method="get"
+          ><code>https://todo-crud.up.railway.app/todo/{id}</code></pre>
+          <p>Where <code>{id}</code> is the todo's id that you've known</p>
+          <p>Example: <code>id: 63a698cb3a772316696921fb</code></p>
+          <p>Response</p>
+          <pre data-method="response"><code>{
+    "_id": "63a698cb3a772316696921fb",
+    "title": "Running 20km",
+    "status": 2
+}</code></pre>
+          <p>Error response</p>
+          <pre data-method="error"><code>{
+    "message": "mongo: no documents in result"
+}</code></pre>
+
+          <h2 id="create-a-todo" class="sm:hover:underline font-bold text-xl">
+            Create a todo
+          </h2>
+          <p>
+            <span class="text-red-500 font-bold">Requirements:</span> All fields
+            of the request body must not be empty
+          </p>
+          <p>This is request body</p>
+          <pre data-method="request"><code>{
+    "title": "Becoming a tech leader",
+    "status": 1
+}</code></pre>
+          <p>API's url</p>
+          <pre
+            data-method="post"
+          ><code>https://todo-crud.up.railway.app/todo</code></pre>
+          <p>Simple response</p>
+          <pre data-method="response"><code>{
+    "InsertedID": "63a6ce111c3ed53d7632c73e"
+}</code></pre>
+
+          <h2 id="update-a-todo" class="sm:hover:underline font-bold text-xl">
+            Update a todo
+          </h2>
+          <p>
+            To update a todo, you must have a specific id of the todo and the
+            body of the request where you want to modify
+          </p>
+          <p>Body</p>
+          <pre data-method="request"><code>{
+    "title": "Becoming a tech leader",
+    "status": 2
+}</code></pre>
+          <pre
+            data-method="put"
+          ><code>https://todo-crud.up.railway.app/todo/{id}</code></pre>
+          <p>Example: <code>id: 63a698cb3a772316696921fb</code></p>
+          <p>Response</p>
+          <pre data-method="response"><code>{
+    "message": "Successfully updated!"
+}</code></pre>
+
+          <h2 id="delete-a-todo" class="sm:hover:underline font-bold text-xl">
+            Delete a todo
+          </h2>
+          <p>To delete a todo you must have its specific id</p>
+          <pre
+            data-method="delete"
+          ><code>https://todo-crud.up.railway.app/todo/{id}</code></pre>
+          <p>For example: <code>id: 63a698cb3a772316696921fb</code></p>
+          <p>Response</p>
+          <pre data-method="response"><code>{
+    "message": "Successfully deleted!"
+}</code></pre>
+        </article>
+      </div>
+    </div>
+  </body>
+</html>
